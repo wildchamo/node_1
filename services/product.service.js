@@ -43,8 +43,9 @@ class ProductsService {
     if (productToUpdate == -1) {
       throw new Error('Product not found');
     } else {
-      this.products[productToUpdate] = {
-        ...this.products[productToUpdate],
+      const product = this.products[productToUpdate];
+      product = {
+        ...product,
         ...productUpdate,
       };
 
