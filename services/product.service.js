@@ -1,5 +1,9 @@
 const { faker } = require('@faker-js/faker');
 
+const boom = require('@hapi/boom');
+
+const Joi = require('joi');
+
 class ProductsService {
   constructor() {
     this.products = [];
@@ -14,36 +18,49 @@ class ProductsService {
         name: faker.commerce.productName().toString(),
         price: parseInt(faker.commerce.price(), 10),
         image: faker.image.url(),
+        isBlock: faker.datatype.boolean(),
       });
     }
-
-    console.log(this.products);
   }
 
-  create(productData) {
+  async create({ name, price, image }) {
     const newProduct = {
       id: this.products.length + 1,
-      ...productData,
+      name,
+      price,
+      image,
     };
     this.products.push(newProduct);
     return newProduct;
   }
 
-  find() {
-    return this.products;
+  async find() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(this.products);
+      }, 2000);
+    });
   }
 
-  findOne(id) {
-    return this.products.find((item) => item.id == id);
+  async findOne(id) {
+    const product = this.products.find((item) => item.id == id);
+    if (!product) {
+      throw boom.notFound('Product not found');
+    }
+    if (product.isBlock) {
+      throw boom.conflict('Product not allowed to see');
+    } else {
+      return product;
+    }
   }
 
-  update(id, productUpdate) {
+  async update(id, productUpdate) {
     const productToUpdate = this.products.findIndex((item) => item.id == id);
 
     if (productToUpdate == -1) {
-      throw new Error('Product not found');
+      throw boom.notFound('Product not found');
     } else {
-      const product = this.products[productToUpdate];
+      let product = this.products[productToUpdate];
       product = {
         ...product,
         ...productUpdate,
@@ -53,10 +70,10 @@ class ProductsService {
     }
   }
 
-  delete(id) {
+  async delete(id) {
     const productToDelete = this.products.findIndex((item) => item.id == id);
     if (productToDelete == -1) {
-      throw new Error('Product not found');
+      throw boom.notFound('Product not found');
     } else {
       this.products.splice(productToDelete, 1);
       return { message: 'Product deleted', id: productToDelete };
