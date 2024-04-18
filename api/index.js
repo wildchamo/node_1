@@ -8,7 +8,6 @@ const {
 } = require('./middlewares/error.handle');
 
 const app = express();
-const port = 3002;
 
 app.use(express.json());
 
@@ -32,7 +31,7 @@ app.use(logErrors);
 app.use(boomErrorHandler);
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(3000, () => {
   console.log(`Prendido papa lindo at http://localhost:${port}`);
 });
 
