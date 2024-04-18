@@ -9,21 +9,8 @@ const {
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
-
-
-const whiteList = ['http://127.0.0.1:5500', "http://localhost:2023"];
-const options = {
-  origin: (origin, callback) => {
-    if (whiteList.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed'));
-    }
-  },
-};
-
-app.use(cors(options));
 routerApi(app);
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
